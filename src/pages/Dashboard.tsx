@@ -1,7 +1,8 @@
 import { format, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
-import { Calendar, Users, Clock, DollarSign, Plus, BookOpen, Lock, CreditCard, Sparkles, MoreHorizontal, Leaf } from 'lucide-react';
+import { Calendar, Users, Clock, DollarSign, Plus, BookOpen, Lock, CreditCard, Sparkles, MoreHorizontal, Leaf, CheckCircle, XCircle } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Badge } from '@/components/ui/badge';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { StatsCard } from '@/components/dashboard/StatsCard';
@@ -14,6 +15,7 @@ import { ScheduleDialog } from '@/components/practitioners/ScheduleDialog';
 import { StaffTutorial, useStaffTutorial } from '@/components/dashboard/StaffTutorial';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -156,6 +158,58 @@ export default function Dashboard() {
       return data;
     },
   });
+
+  const { data: pendingDemoSignups = [], refetch: refetchDemoSignups } = useQuery({
+    queryKey: ['demo-signups-pending'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('demo_signups')
+        .select('*')
+        .eq('status', 'pending')
+        .not('approval_token', 'is', null)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
+  const [approvingDemo, setApprovingDemo] = useState<string | null>(null);
+  const [rejectingDemo, setRejectingDemo] = useState<string | null>(null);
+
+  const handleApproveDemo = async (token: string) => {
+    setApprovingDemo(token);
+    try {
+      const { data, error } = await supabase.functions.invoke('approve-demo', {
+        body: { token, action: 'approve' },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      toast.success('Demo approved. They will receive their credentials via email.');
+      refetchDemoSignups();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Failed to approve demo');
+    } finally {
+      setApprovingDemo(null);
+    }
+  };
+
+  const handleRejectDemo = async (token: string) => {
+    setRejectingDemo(token);
+    try {
+      const { data, error } = await supabase.functions.invoke('approve-demo', {
+        body: { token, action: 'reject' },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      toast.success('Demo request rejected');
+      refetchDemoSignups();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Failed to reject demo');
+    } finally {
+      setRejectingDemo(null);
+    }
+  };
 
   const isLoading = bookingsLoading || practitionersLoading || roomsLoading || servicesLoading;
 
@@ -590,6 +644,54 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Pending Demo Requests */}
+        {pendingDemoSignups.length > 0 && (
+          <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+            <CardContent className="py-4">
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="font-semibold text-foreground">Demo Requests</h3>
+                <Badge variant="secondary">{pendingDemoSignups.length}</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">People who requested a demo from the landing page. Approve to send them login credentials.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {pendingDemoSignups.map((d: { id: string; name: string; email: string; business_name?: string; approval_token: string }) => (
+                  <div
+                    key={d.id}
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-lg bg-background/80 border border-border"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-medium text-foreground truncate">{d.name}</p>
+                      <p className="text-sm text-muted-foreground truncate">{d.email}</p>
+                      {d.business_name && <p className="text-xs text-muted-foreground truncate">{d.business_name}</p>}
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <Button
+                        size="sm"
+                        className="gap-1.5 bg-sage hover:bg-sage/90"
+                        onClick={() => handleApproveDemo(d.approval_token)}
+                        disabled={approvingDemo === d.approval_token || rejectingDemo === d.approval_token}
+                      >
+                        {approvingDemo === d.approval_token ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1.5 text-destructive hover:bg-destructive/10"
+                        onClick={() => handleRejectDemo(d.approval_token)}
+                        disabled={approvingDemo === d.approval_token || rejectingDemo === d.approval_token}
+                      >
+                        {rejectingDemo === d.approval_token ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <XCircle className="w-3.5 h-3.5" />}
+                        Reject
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Pending Approvals */}
         <PendingApprovals

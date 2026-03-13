@@ -63,6 +63,8 @@ const PrivacyPage = lazyWithRetry(() => import("./pages/PrivacyPage"));
 const TermsPage = lazyWithRetry(() => import("./pages/TermsPage"));
 const SmsConsentPage = lazyWithRetry(() => import("./pages/SmsConsentPage"));
 const SmsConsentConfirmPage = lazyWithRetry(() => import("./pages/SmsConsentConfirmPage"));
+const ApproveInvitePage = lazyWithRetry(() => import("./pages/ApproveInvitePage"));
+const ApproveDemoPage = lazyWithRetry(() => import("./pages/ApproveDemoPage"));
 const CustomersPage = lazyWithRetry(() => import("./pages/CustomersPage"));
 const MessagesPage = lazyWithRetry(() => import("./pages/MessagesPage"));
 const IntakeFormsPage = lazyWithRetry(() => import("./pages/IntakeFormsPage"));
@@ -166,6 +168,8 @@ function AppRoutes() {
               <Route path="/privacy/terms" element={<TermsPage />} />
               <Route path="/sms-consent" element={<SmsConsentPage />} />
               <Route path="/sms-consent/confirm" element={<SmsConsentConfirmPage />} />
+              <Route path="/approve-invite" element={<ApproveInvitePage />} />
+              <Route path="/approve-demo" element={<ApproveDemoPage />} />
               
               {/* Public landing page */}
               <Route path="/" element={<LandingPage />} />

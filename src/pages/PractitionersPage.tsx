@@ -6,7 +6,7 @@ import { EditPractitionerDialog } from '@/components/practitioners/EditPractitio
 import { AddPractitionerDialog } from '@/components/practitioners/AddPractitionerDialog';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Plus, Loader2, Eye, EyeOff, RotateCcw } from 'lucide-react';
+import { Plus, Loader2, Eye, EyeOff, RotateCcw, CheckCircle, XCircle } from 'lucide-react';
 import { usePractitioners } from '@/hooks/usePractitioners';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,6 +39,59 @@ export default function PractitionersPage() {
   const [deactivating, setDeactivating] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [reactivating, setReactivating] = useState<string | null>(null);
+  const [approvingInvite, setApprovingInvite] = useState<string | null>(null);
+  const [rejectingInvite, setRejectingInvite] = useState<string | null>(null);
+
+  // Fetch pending invites (admin only)
+  const { data: pendingInvites = [], refetch: refetchPending } = useQuery({
+    queryKey: ['pending-invites'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('pending_invites')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
+  const handleApproveInvite = async (token: string) => {
+    setApprovingInvite(token);
+    try {
+      const { data, error } = await supabase.functions.invoke('approve-invite', {
+        body: { token, action: 'approve' },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      toast.success('Invite approved. User will receive their credentials via email.');
+      refetch();
+      refetchPending();
+      queryClient.invalidateQueries({ queryKey: ['dashboard-practitioners'] });
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Failed to approve invite');
+    } finally {
+      setApprovingInvite(null);
+    }
+  };
+
+  const handleRejectInvite = async (token: string) => {
+    setRejectingInvite(token);
+    try {
+      const { data, error } = await supabase.functions.invoke('approve-invite', {
+        body: { token, action: 'reject' },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      toast.success('Invite rejected');
+      refetchPending();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Failed to reject invite');
+    } finally {
+      setRejectingInvite(null);
+    }
+  };
 
   // Fetch deactivated practitioners when toggle is on
   const { data: deactivatedPractitioners } = useQuery({
@@ -172,6 +225,61 @@ export default function PractitionersPage() {
           </div>
         )}
 
+        {/* Pending invites - require Ryan's approval */}
+        {isAdmin && pendingInvites.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <h2 className="font-display text-lg font-semibold text-foreground">Pending Invites</h2>
+              <Badge variant="secondary">{pendingInvites.length}</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">These users need approval before they receive their login credentials.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {pendingInvites.map((inv) => (
+                <div
+                  key={inv.id}
+                  className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground">{inv.name}</p>
+                    <p className="text-sm text-muted-foreground truncate">{inv.email}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Role: {inv.role}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5 text-sage border-sage/50 hover:bg-sage/10"
+                      onClick={() => handleApproveInvite(inv.approval_token)}
+                      disabled={approvingInvite === inv.approval_token || rejectingInvite === inv.approval_token}
+                    >
+                      {approvingInvite === inv.approval_token ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <CheckCircle className="w-3.5 h-3.5" />
+                      )}
+                      Approve
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5 text-destructive hover:bg-destructive/10"
+                      onClick={() => handleRejectInvite(inv.approval_token)}
+                      disabled={approvingInvite === inv.approval_token || rejectingInvite === inv.approval_token}
+                    >
+                      {rejectingInvite === inv.approval_token ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <XCircle className="w-3.5 h-3.5" />
+                      )}
+                      Reject
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Grid */}
         {practitioners && practitioners.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -270,7 +378,7 @@ export default function PractitionersPage() {
       <AddPractitionerDialog
         open={addDialogOpen}
         onOpenChange={setAddDialogOpen}
-        onCreated={() => refetch()}
+        onCreated={() => { refetch(); refetchPending(); }}
       />
 
       <AlertDialog open={!!deactivateTarget} onOpenChange={(open) => !open && setDeactivateTarget(null)}>

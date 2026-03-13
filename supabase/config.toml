@@ -107,3 +107,9 @@ verify_jwt = false
 
 [functions.demo-signup]
 verify_jwt = false
+
+[functions.approve-invite]
+verify_jwt = false
+
+[functions.approve-demo]
+verify_jwt = false

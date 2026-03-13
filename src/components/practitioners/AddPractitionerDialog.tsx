@@ -182,16 +182,16 @@ export function AddPractitionerDialog({ open, onOpenChange, onCreated }: AddPrac
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
                 <Check className="w-6 h-6 text-primary" />
               </div>
-              <p className="font-medium text-foreground">Welcome email sent!</p>
+              <p className="font-medium text-foreground">Invite created</p>
               <p className="text-sm text-muted-foreground">
-                A welcome email has been sent to <strong>{formData.email}</strong> with their login credentials, a quick-start guide, and everything they need to get started.
+                An invite has been created for <strong>{formData.email}</strong>. Ryan will receive a notification and must approve before they receive their login credentials.
               </p>
             </div>
 
             <div className="text-sm text-muted-foreground space-y-1">
-              <p>✅ Login credentials included</p>
-              <p>✅ Step-by-step onboarding guide</p>
-              <p>✅ They'll set their own password on first login</p>
+              <p>✅ Ryan notified at ryan.bach91@gmail.com</p>
+              <p>✅ Approval required before credentials are sent</p>
+              <p>✅ They&apos;ll set their own password on first login</p>
             </div>
 
             <div className="flex justify-end pt-4">

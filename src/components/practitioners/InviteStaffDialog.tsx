@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { toast } from 'sonner';
 import { Loader2, Check, UserPlus } from 'lucide-react';
@@ -23,6 +24,7 @@ export function InviteStaffDialog({
   practitionerName,
   practitionerEmail 
 }: InviteStaffDialogProps) {
+  const queryClient = useQueryClient();
   const [email, setEmail] = useState(practitionerEmail);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -59,7 +61,8 @@ export function InviteStaffDialog({
       }
 
       setSuccess(true);
-      toast.success('Staff login created — welcome email sent!');
+      queryClient.invalidateQueries({ queryKey: ['pending-invites'] });
+      toast.success('Invite created. Ryan must approve before they receive their credentials.');
     } catch (error: unknown) {
       console.error('Invite error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to create staff login');
@@ -135,16 +138,16 @@ export function InviteStaffDialog({
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
                 <Check className="w-6 h-6 text-primary" />
               </div>
-              <p className="font-medium text-foreground">Welcome email sent!</p>
+              <p className="font-medium text-foreground">Invite created</p>
               <p className="text-sm text-muted-foreground">
-                A welcome email has been sent to <strong>{email}</strong> with their login credentials, a quick-start guide, and everything they need to get started.
+                An invite has been created for <strong>{email}</strong>. Ryan will receive a notification and must approve before they receive their login credentials.
               </p>
             </div>
 
             <div className="text-sm text-muted-foreground space-y-1">
-              <p>✅ Login credentials included</p>
-              <p>✅ Step-by-step onboarding guide</p>
-              <p>✅ They'll set their own password on first login</p>
+              <p>✅ Ryan notified at ryan.bach91@gmail.com</p>
+              <p>✅ Approval required before credentials are sent</p>
+              <p>✅ They&apos;ll set their own password on first login</p>
             </div>
 
             <div className="flex justify-end pt-2">
