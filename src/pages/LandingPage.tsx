@@ -69,6 +69,7 @@ const LandingPage = () => {
                   src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200"
                   alt="Peaceful meditation in nature"
                   className="w-full h-56 md:h-72 object-cover rounded-2xl shadow-lg"
+                  referrerPolicy="no-referrer"
                 />
               </div>
               <div className="text-center mb-16">
@@ -158,6 +159,7 @@ const LandingPage = () => {
                 src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800"
                 alt="Corporate office building"
                 className="w-full h-48 object-cover rounded-xl mb-8"
+                referrerPolicy="no-referrer"
               />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
@@ -257,6 +259,7 @@ const LandingPage = () => {
                 src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200"
                 alt="Welcoming wellness studio"
                 className="w-full h-40 md:h-48 object-cover rounded-xl"
+                referrerPolicy="no-referrer"
               />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
@@ -295,9 +298,10 @@ const LandingPage = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto mb-12">
               <img
-                src="https://images.unsplash.com/photo-1571902943202-507e261dc740?w=1200"
+                src="https://images.unsplash.com/photo-1544161515-4ab6d6d49b23?w=1200"
                 alt="Personalized spa treatment room"
                 className="w-full h-48 md:h-56 object-cover rounded-xl"
+                referrerPolicy="no-referrer"
               />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
@@ -380,11 +384,13 @@ const LandingPage = () => {
                 src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800"
                 alt="Thoughtful wellness space"
                 className="w-full h-48 object-cover rounded-xl order-2 md:order-1"
+                referrerPolicy="no-referrer"
               />
               <img
                 src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800"
                 alt="Small yoga studio"
                 className="w-full h-48 object-cover rounded-xl order-1 md:order-2"
+                referrerPolicy="no-referrer"
               />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
@@ -434,6 +440,7 @@ const LandingPage = () => {
                 src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1200"
                 alt="Calm yoga practice"
                 className="w-full h-40 md:h-48 object-cover rounded-xl"
+                referrerPolicy="no-referrer"
               />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
