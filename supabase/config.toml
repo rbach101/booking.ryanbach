@@ -96,5 +96,8 @@ verify_jwt = false
 [functions.health-monitor]
 verify_jwt = false
 
+[functions.invite-user]
+verify_jwt = false
+
 [functions.coupon-signup]
 verify_jwt = false

@@ -58,7 +58,16 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { email, name, role, practitioner_id } = await req.json();
+    let body: { email?: string; name?: string; role?: string; practitioner_id?: string };
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: 'Invalid request body: expected JSON' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const { email, name, role, practitioner_id } = body;
 
     if (!email) {
       return new Response(JSON.stringify({ error: 'Email is required' }), {
