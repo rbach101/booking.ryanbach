@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { trackBookingApproved, trackBookingCancelled } from '@/lib/klaviyo';
 import { useAuditLog } from '@/hooks/useAuditLog';
 import { format } from 'date-fns';
@@ -270,7 +271,9 @@ export default function BookingsPage() {
 
   const handleApproval = async (bookingId: string, action: 'approve' | 'decline') => {
     try {
+      const headers = await getEdgeFunctionHeaders();
       const response = await supabase.functions.invoke('approve-booking', {
+        headers,
         body: { bookingId, action }
       });
 
@@ -333,10 +336,10 @@ export default function BookingsPage() {
 
     // Delete Google Calendar event first (before DB delete removes the google_event_id)
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.access_token) {
+      const headers = await getEdgeFunctionHeaders();
+      if (headers.Authorization) {
         await supabase.functions.invoke('google-calendar-sync', {
-          headers: { Authorization: `Bearer ${session.access_token}` },
+          headers,
           body: { action: 'delete-event', bookingId: bookingToDelete },
         });
       }

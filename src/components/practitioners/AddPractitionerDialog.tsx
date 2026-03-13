@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { getFunctionErrorMessage } from '@/lib/functionError';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -50,10 +51,13 @@ export function AddPractitionerDialog({ open, onOpenChange, onCreated }: AddPrac
       if (practitionerError) throw practitionerError;
 
       // Then invite the user with the edge function
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const headers = await getEdgeFunctionHeaders();
+      if (!headers.Authorization) {
+        toast.error('Session expired. Please log in again.');
+        return;
+      }
       const response = await supabase.functions.invoke('invite-user', {
-        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
+        headers,
         body: {
           email: formData.email.trim(),
           name: formData.name.trim(),

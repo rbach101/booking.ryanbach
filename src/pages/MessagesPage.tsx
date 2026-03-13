@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { getFunctionErrorMessage } from '@/lib/functionError';
 import { formatDistanceToNow, format } from 'date-fns';
 import { Send, MessageSquare, Search, Phone, User } from 'lucide-react';
@@ -109,7 +110,9 @@ export default function MessagesPage() {
     if (!newMessage.trim() || !selectedCustomer?.phone) return;
     setSending(true);
     try {
+      const headers = await getEdgeFunctionHeaders();
       const response = await supabase.functions.invoke('send-sms', {
+        headers,
         body: {
           to: selectedCustomer.phone,
           message: newMessage.trim(),

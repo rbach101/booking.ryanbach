@@ -18,6 +18,7 @@ import { INSURANCE_DISCLAIMER } from '@/data/fullServiceData';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { getFunctionErrorMessage } from '@/lib/functionError';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { usePractitioners } from '@/hooks/usePractitioners';
@@ -235,10 +236,10 @@ export function NewBookingDialog({
     }) => {
       // Route through create-appointment edge function for server-side
       // Google Calendar conflict checking (double prevention)
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) throw new Error('Not authenticated. Please log in.');
+      const headers = await getEdgeFunctionHeaders();
+      if (!headers.Authorization) throw new Error('Not authenticated. Please log in.');
       const { data, error } = await supabase.functions.invoke('create-appointment', {
-        headers: { Authorization: `Bearer ${session.access_token}` },
+        headers,
         body: {
           clientName: bookingData.client_name,
           clientEmail: bookingData.client_email,

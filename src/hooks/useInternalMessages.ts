@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { toast } from 'sonner';
 
 interface Message {
@@ -31,7 +32,9 @@ export function useInternalMessages() {
       const { data: session } = await supabase.auth.getSession();
       if (!session.session) return;
 
+      const headers = await getEdgeFunctionHeaders();
       const response = await supabase.functions.invoke('internal-messages', {
+        headers,
         body: { action: 'list' }
       });
 
@@ -50,7 +53,9 @@ export function useInternalMessages() {
 
   const sendMessage = async (content: string, recipientId?: string | null, bookingId?: string) => {
     try {
+      const headers = await getEdgeFunctionHeaders();
       const response = await supabase.functions.invoke('internal-messages', {
+        headers,
         body: { 
           action: 'send',
           content,
@@ -76,7 +81,9 @@ export function useInternalMessages() {
 
   const markAsRead = async (messageId: string) => {
     try {
+      const headers = await getEdgeFunctionHeaders();
       await supabase.functions.invoke('internal-messages', {
+        headers,
         body: { action: 'mark-read', messageId }
       });
 

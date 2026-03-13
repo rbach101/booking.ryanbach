@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { CSSProperties } from 'react';
 import { InviteStaffDialog } from './InviteStaffDialog';
 import { supabase } from '@/integrations/supabase/client';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { getFunctionErrorMessage } from '@/lib/functionError';
 import { toast } from 'sonner';
 
@@ -42,8 +43,9 @@ export function PractitionerCard({ practitioner, className, style, onEditSchedul
     
     setResettingPassword(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const headers = await getEdgeFunctionHeaders();
       const response = await supabase.functions.invoke('reset-staff-password', {
+        headers,
         body: { user_id: userId },
       });
 

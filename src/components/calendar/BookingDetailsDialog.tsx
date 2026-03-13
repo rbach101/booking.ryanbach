@@ -31,6 +31,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { debugLog } from '@/lib/debugLog';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -241,9 +242,8 @@ export function BookingDetailsDialog({
 
       // Sync duration change to Google Calendar (delete old event if any, create with new end time)
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const headers = session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined;
-        if (headers) {
+        const headers = await getEdgeFunctionHeaders();
+        if (headers.Authorization) {
           await supabase.functions.invoke('google-calendar-sync', { headers, body: { action: 'delete-event', bookingId: booking.id } }).catch(() => {});
           await supabase.functions.invoke('google-calendar-sync', { headers, body: { action: 'create-event', bookingId: booking.id } });
         }
@@ -268,11 +268,11 @@ export function BookingDetailsDialog({
   const handleSyncCalendar = async () => {
     setIsSyncing(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) throw new Error('Not authenticated');
+      const headers = await getEdgeFunctionHeaders();
+      if (!headers.Authorization) throw new Error('Not authenticated');
 
       const { data, error } = await supabase.functions.invoke('google-calendar-sync', {
-        headers: { Authorization: `Bearer ${session.access_token}` },
+        headers,
         body: { action: 'create-event', bookingId: booking.id },
       });
 
@@ -319,10 +319,10 @@ export function BookingDetailsDialog({
     try {
       // Delete Google Calendar event first (before DB delete removes the google_event_id)
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.access_token) {
+        const headers = await getEdgeFunctionHeaders();
+        if (headers.Authorization) {
           await supabase.functions.invoke('google-calendar-sync', {
-            headers: { Authorization: `Bearer ${session.access_token}` },
+            headers,
             body: { action: 'delete-event', bookingId: booking.id },
           });
         }
@@ -525,10 +525,10 @@ export function BookingDetailsDialog({
 
       // Delete old calendar events before updating
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.access_token) {
+        const headers = await getEdgeFunctionHeaders();
+        if (headers.Authorization) {
           await supabase.functions.invoke('google-calendar-sync', {
-            headers: { Authorization: `Bearer ${session.access_token}` },
+            headers,
             body: { action: 'delete-event', bookingId: booking.id },
           });
         }
@@ -546,10 +546,10 @@ export function BookingDetailsDialog({
 
       // Re-sync calendar with new time
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.access_token) {
+        const headers = await getEdgeFunctionHeaders();
+        if (headers.Authorization) {
           await supabase.functions.invoke('google-calendar-sync', {
-            headers: { Authorization: `Bearer ${session.access_token}` },
+            headers,
             body: { action: 'create-event', bookingId: booking.id },
           });
         }

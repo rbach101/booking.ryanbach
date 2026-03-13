@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { toast } from 'sonner';
 import { Loader2, Check, UserPlus } from 'lucide-react';
 
@@ -34,17 +35,18 @@ export function InviteStaffDialog({
 
     setLoading(true);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      
+      const headers = await getEdgeFunctionHeaders();
+      if (!headers.Authorization) {
+        toast.error('Session expired. Please log in again.');
+        return;
+      }
       const response = await supabase.functions.invoke('invite-user', {
+        headers,
         body: {
           email,
           name: practitionerName,
           role: 'staff',
           practitioner_id: practitionerId,
-        },
-        headers: {
-          Authorization: `Bearer ${sessionData.session?.access_token}`,
         },
       });
 

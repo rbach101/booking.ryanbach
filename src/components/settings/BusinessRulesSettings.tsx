@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { toast } from 'sonner';
 import { Plus, Trash2, Shield, ShieldAlert, ShieldCheck, Loader2, Play, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
@@ -136,7 +137,8 @@ export function BusinessRulesSettings() {
   const runScan = async () => {
     setScanning(true);
     try {
-      const { data, error } = await supabase.functions.invoke('monitor-bookings');
+      const headers = await getEdgeFunctionHeaders();
+      const { data, error } = await supabase.functions.invoke('monitor-bookings', { headers });
       if (error) throw error;
       const result = data as any;
       if (result.violations?.length > 0) {

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { getFunctionErrorMessage } from '@/lib/functionError';
 import { toast } from 'sonner';
 import { Loader2, Shield, KeyRound, Copy, Check, Users } from 'lucide-react';
@@ -91,7 +92,9 @@ export function SecuritySettings() {
     setResettingPassword(true);
     setTempPassword(null);
     try {
+      const headers = await getEdgeFunctionHeaders();
       const response = await supabase.functions.invoke('reset-staff-password', {
+        headers,
         body: { user_id: practitioner.user_id },
       });
 

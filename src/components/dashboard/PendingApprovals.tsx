@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { getFunctionErrorMessage } from '@/lib/functionError';
 import { trackBookingApproved, trackBookingCancelled } from '@/lib/klaviyo';
 import { usePractitioners } from '@/hooks/usePractitioners';
@@ -154,14 +155,13 @@ export function PendingApprovals({ bookings, practitioners, onRefresh }: Pending
 
     setLoading(true);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData.session?.access_token;
-
-      if (!token) {
+      const headers = await getEdgeFunctionHeaders();
+      if (!headers.Authorization) {
         throw new Error('Not authenticated');
       }
 
       const response = await supabase.functions.invoke('approve-booking', {
+        headers,
         body: {
           bookingId: selectedBooking.id,
           action,
@@ -377,9 +377,8 @@ export function PendingApprovals({ bookings, practitioners, onRefresh }: Pending
 
       // Sync reschedule to Google Calendar
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.access_token) {
-          const headers = { Authorization: `Bearer ${session.access_token}` };
+        const headers = await getEdgeFunctionHeaders();
+        if (headers.Authorization) {
           await supabase.functions.invoke('google-calendar-sync', { headers, body: { action: 'delete-event', bookingId: rescheduleBooking.id } }).catch(() => {});
           await supabase.functions.invoke('google-calendar-sync', { headers, body: { action: 'create-event', bookingId: rescheduleBooking.id } });
         }
@@ -506,9 +505,8 @@ export function PendingApprovals({ bookings, practitioners, onRefresh }: Pending
 
       // Sync practitioner change to Google Calendar (event moves to new practitioner's calendar)
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.access_token) {
-          const headers = { Authorization: `Bearer ${session.access_token}` };
+        const headers = await getEdgeFunctionHeaders();
+        if (headers.Authorization) {
           await supabase.functions.invoke('google-calendar-sync', { headers, body: { action: 'delete-event', bookingId: booking.id } }).catch(() => {});
           await supabase.functions.invoke('google-calendar-sync', { headers, body: { action: 'create-event', bookingId: booking.id } });
         }

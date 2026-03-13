@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
 import { getFunctionErrorMessage } from '@/lib/functionError';
 import { toast } from 'sonner';
 import { Loader2, Mail, MessageSquare, Users, Clock, Pencil, Calendar, Bell, UserCheck, Eye, Send, Phone, CheckCircle2, Link, Copy } from 'lucide-react';
@@ -211,7 +212,9 @@ export function NotificationSettings() {
         </div>
       `;
 
+      const headers = await getEdgeFunctionHeaders();
       const { error } = await supabase.functions.invoke('send-test-email', {
+        headers,
         body: { to: testEmail, subject: `[TEST] ${subject}`, html: fullHtml },
       });
 
@@ -282,7 +285,8 @@ export function NotificationSettings() {
               onClick={async () => {
                 setProvisioningKlaviyo(true);
                 try {
-                  const { data, error } = await supabase.functions.invoke('setup-klaviyo-flows');
+                  const headers = await getEdgeFunctionHeaders();
+                  const { data, error } = await supabase.functions.invoke('setup-klaviyo-flows', { headers });
                   if (error) throw new Error(await getFunctionErrorMessage(error));
                   const results = data?.results || [];
                   const created = results.filter((r: any) => r.status === 'created').length;
