@@ -24,6 +24,7 @@ const CONFIRMATION_SALES_HTML = `
 `;
 
 serve(async (req) => {
+  console.log('[demo-signup] Request received', { method: req.method, url: req.url });
   const corsHeaders = getCorsHeaders(req);
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -67,16 +68,17 @@ serve(async (req) => {
     const approveUrl = `${BRAND.siteUrl}/approve-demo?token=${approvalToken}`;
     const resendKey = Deno.env.get('RESEND_API_KEY');
 
-    if (resendKey) {
+    if (!resendKey) {
+      console.error('[demo-signup] RESEND_API_KEY is not set. Emails will not be sent. Add it in Supabase Dashboard → Project Settings → Edge Functions → Secrets.');
+    } else {
       const resend = new Resend(resendKey);
 
       // 1. Notify Ryan
-      try {
-        await resend.emails.send({
-          from: BRAND.fromSupport,
-          to: RYAN_EMAIL,
-          subject: `[${BRAND.name}] New demo request: ${trimmedName} (${trimmedEmail})`,
-          html: `
+      const ryanResult = await resend.emails.send({
+        from: BRAND.fromSupport,
+        to: RYAN_EMAIL,
+        subject: `[${BRAND.name}] New demo request: ${trimmedName} (${trimmedEmail})`,
+        html: `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #333;">New Demo Request</h2>
               <p style="color: #555;">Someone requested a demo from the landing page.</p>
@@ -92,19 +94,18 @@ serve(async (req) => {
               ${BRAND.emailFooterHtml}
             </div>
           `,
-          text: `New Demo Request\n\nName: ${trimmedName}\nEmail: ${trimmedEmail}\nBusiness: ${business_name?.trim() || '—'}\nPhone: ${phone?.trim() || '—'}\n\nApprove: ${approveUrl}`,
-        });
-      } catch (e) {
-        console.error('Failed to send approval notification to Ryan:', e);
+        text: `New Demo Request\n\nName: ${trimmedName}\nEmail: ${trimmedEmail}\nBusiness: ${business_name?.trim() || '—'}\nPhone: ${phone?.trim() || '—'}\n\nApprove: ${approveUrl}`,
+      });
+      if ((ryanResult as { error?: { message?: string } }).error) {
+        console.error('[demo-signup] Failed to email Ryan:', (ryanResult as { error: { message: string } }).error?.message || ryanResult);
       }
 
       // 2. Confirmation + sales info to the person who submitted
-      try {
-        await resend.emails.send({
-          from: BRAND.fromSupport,
-          to: trimmedEmail,
-          subject: `We received your demo request — ${BRAND.name}`,
-          html: `
+      const confirmResult = await resend.emails.send({
+        from: BRAND.fromSupport,
+        to: trimmedEmail,
+        subject: `We received your demo request — ${BRAND.name}`,
+        html: `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: ${BRAND.primaryColor}; padding: 32px 24px; text-align: center; border-radius: 8px 8px 0 0;">
                 <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Thanks for your interest!</h1>
@@ -125,10 +126,10 @@ serve(async (req) => {
               ${BRAND.emailFooterHtml}
             </div>
           `,
-          text: `Thanks for your interest, ${trimmedName}!\n\nWe've received your demo request and will contact you soon with setup information and next steps.\n\nIn the meantime, here's why small businesses choose Custom Booking:\n\nCustom Booking is built specifically for wellness businesses — spas, massage studios, yoga studios, therapy practices, and salons.\n\n• Custom tailored — Every feature is configured to match how your business operates.\n• Online booking 24/7 — Clients book and pay deposits without calling.\n• Calendar sync — Connect Google Calendar to avoid double-booking.\n• Automated reminders — Email and SMS reminders reduce no-shows.\n• Payments & deposits — Collect deposits, tips, and balances online.\n• Intake forms & SOAP notes — HIPAA-ready documentation.\n• Memberships & packages — Sell memberships and session packages.\n\nWe'll contact you soon. Questions? ${BRAND.supportEmail}`,
-        });
-      } catch (e) {
-        console.error('Failed to send confirmation email to submitter:', e);
+        text: `Thanks for your interest, ${trimmedName}!\n\nWe've received your demo request and will contact you soon with setup information and next steps.\n\nIn the meantime, here's why small businesses choose Custom Booking:\n\nCustom Booking is built specifically for wellness businesses — spas, massage studios, yoga studios, therapy practices, and salons.\n\n• Custom tailored — Every feature is configured to match how your business operates.\n• Online booking 24/7 — Clients book and pay deposits without calling.\n• Calendar sync — Connect Google Calendar to avoid double-booking.\n• Automated reminders — Email and SMS reminders reduce no-shows.\n• Payments & deposits — Collect deposits, tips, and balances online.\n• Intake forms & SOAP notes — HIPAA-ready documentation.\n• Memberships & packages — Sell memberships and session packages.\n\nWe'll contact you soon. Questions? ${BRAND.supportEmail}`,
+      });
+      if ((confirmResult as { error?: { message?: string } }).error) {
+        console.error('[demo-signup] Failed to email submitter:', (confirmResult as { error: { message: string } }).error?.message || confirmResult);
       }
     }
 
