@@ -1,8 +1,9 @@
 import { format, subWeeks, startOfWeek, endOfWeek } from 'date-fns';
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
-import { Calendar, Users, Clock, DollarSign, Plus, BookOpen, Lock, CreditCard, Sparkles, MoreHorizontal } from 'lucide-react';
+import { Calendar, Users, Clock, DollarSign, Plus, BookOpen, Lock, CreditCard, Sparkles, MoreHorizontal, Leaf } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { Card, CardContent } from '@/components/ui/card';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { UpcomingBookings } from '@/components/dashboard/UpcomingBookings';
 import { PendingApprovals } from '@/components/dashboard/PendingApprovals';
@@ -381,6 +382,19 @@ export default function Dashboard() {
           </div>
           </div>
 
+          {/* Custom Tailored Notice */}
+          <Card className="border-sage/30 bg-sage/5">
+            <CardContent className="flex items-center gap-4 py-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sage/15">
+                <Leaf className="h-5 w-5 text-sage" />
+              </div>
+              <div>
+                <p className="font-medium text-foreground">Built for your business</p>
+                <p className="text-sm text-muted-foreground">Every feature is custom tailored to your specific business needs — from services and workflows to branding and integrations.</p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Pending Approvals - First thing staff sees */}
           <PendingApprovals
             bookings={transformedBookings}
@@ -563,6 +577,19 @@ export default function Dashboard() {
             />
           </div>
         </div>
+
+        {/* Custom Tailored Notice */}
+        <Card className="border-sage/30 bg-sage/5">
+          <CardContent className="flex items-center gap-4 py-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sage/15">
+              <Leaf className="h-5 w-5 text-sage" />
+            </div>
+            <div>
+              <p className="font-medium text-foreground">Built for your business</p>
+              <p className="text-sm text-muted-foreground">Every feature is custom tailored to your specific business needs — from services and workflows to branding and integrations.</p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Pending Approvals */}
         <PendingApprovals

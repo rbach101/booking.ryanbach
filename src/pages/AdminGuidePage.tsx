@@ -9,7 +9,7 @@ import {
   Calendar, Users, Clock, Bell, CreditCard, FileText, ClipboardList,
   UserPlus, MessageSquare, Shield, Settings, ChevronDown, ChevronRight,
   CheckCircle, ArrowRight, AlertTriangle, Leaf, Home, Search, Mail,
-  Phone, DollarSign, UserCheck, BookOpen, Smartphone, Globe, Download, Printer
+  Phone, DollarSign, UserCheck, BookOpen, Smartphone, Globe, Download, Printer, Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -31,6 +31,24 @@ interface FlowStep {
 }
 
 const flowSections: FlowSection[] = [
+  {
+    id: 'potential-clients',
+    icon: <Sparkles className="w-5 h-5" />,
+    title: 'For Potential Clients',
+    badge: 'Overview',
+    badgeVariant: 'outline',
+    description: 'This booking platform is custom tailored to your specific business needs. Every feature — from services and workflows to branding and integrations — is configured to match how your business operates.',
+    steps: [
+      { label: 'Built for your industry', detail: 'Designed for wellness businesses: spas, massage studios, yoga studios, therapy practices, and similar service-based operations.' },
+      { label: 'Configured to your workflows', detail: 'Approval flows, deposit rules, check-in, SOAP notes, memberships, and intake forms are set up to match your processes.' },
+      { label: 'Your branding, your domain', detail: 'The booking page, emails, and client-facing materials use your business name, colors, and contact information.' },
+      { label: 'Scalable and flexible', detail: 'Add practitioners, rooms, services, and extras as your business grows. Integrations (Stripe, Google Calendar, SMS) are included.' },
+    ],
+    tips: [
+      'Use this guide when showing the platform to potential business clients.',
+      'Contact your account manager for customizations or additional features.',
+    ],
+  },
   {
     id: 'booking-flow',
     icon: <Globe className="w-5 h-5" />,

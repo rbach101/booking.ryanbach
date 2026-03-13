@@ -603,7 +603,7 @@ serve(async (req) => {
         const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
         if (RESEND_API_KEY) {
           try {
-            const { Resend } = await import("https://esm.sh/resend@4.0.0");
+            const { Resend } = await import("https://esm.sh/resend@6.9.3");
             const resend = new Resend(RESEND_API_KEY);
 
             // Get service name

@@ -209,13 +209,13 @@ export default function PractitionersPage() {
               {deactivatedPractitioners.map((p) => (
                 <div
                   key={p.id}
-                  className="bg-card/50 border border-border/50 rounded-xl p-4 opacity-70 flex items-center justify-between gap-4"
+                  className="bg-card/50 border border-border/50 rounded-xl p-4 opacity-70 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
                 >
                   <div className="min-w-0">
                     <p className="font-medium text-foreground truncate">{p.name}</p>
                     <p className="text-sm text-muted-foreground truncate">{p.email}</p>
                   </div>
-                  <div className="flex gap-2 shrink-0">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -233,7 +233,7 @@ export default function PractitionersPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
                       onClick={() => setDeleteTarget(p)}
                       disabled={deleting}
                     >

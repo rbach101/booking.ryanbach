@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { Resend } from 'https://esm.sh/resend@4.0.0';
+import { Resend } from 'https://esm.sh/resend@6.9.3';
 import { BRAND } from '../_shared/brand.ts';
 import { getCorsHeaders } from "../_shared/cors.ts";
 
