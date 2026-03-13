@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { 
   Calendar, Users, Bell, Clock, CheckCircle, 
-  ChevronRight, ChevronLeft, X, BookOpen,
+  ChevronRight, ChevronLeft, BookOpen,
   CalendarCheck, MessageSquare, UserCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -106,25 +106,15 @@ export function StaffTutorial({ open, onClose }: StaffTutorialProps) {
     onClose();
   };
 
-  const handleSkip = () => {
-    localStorage.setItem('staff_tutorial_completed', 'true');
-    onClose();
-  };
-
   const step = tutorialSteps[currentStep];
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sage">
-              <BookOpen className="w-5 h-5" />
-              <span className="text-sm font-medium">Quick Start Guide</span>
-            </div>
-            <Button variant="ghost" size="sm" onClick={handleSkip} className="text-muted-foreground">
-              <X className="w-4 h-4" />
-            </Button>
+          <div className="flex items-center gap-2 text-sage">
+            <BookOpen className="w-5 h-5" />
+            <span className="text-sm font-medium">Quick Start Guide</span>
           </div>
         </DialogHeader>
 

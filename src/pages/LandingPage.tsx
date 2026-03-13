@@ -1,9 +1,38 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
-import { Leaf, Calendar, Users, Clock, MapPin, Phone, Mail } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Leaf, Calendar, Users, Clock, MapPin, Phone, Mail, Sparkles } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const LandingPage = () => {
+  const [demoForm, setDemoForm] = useState({ name: '', email: '', businessName: '' });
+  const [demoStatus, setDemoStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [demoError, setDemoError] = useState('');
+
+  const handleDemoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDemoError('');
+    setDemoStatus('loading');
+    try {
+      const { data, error } = await supabase.functions.invoke('demo-signup', {
+        body: {
+          name: demoForm.name.trim(),
+          email: demoForm.email.trim(),
+          business_name: demoForm.businessName.trim() || undefined,
+        },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      setDemoStatus('success');
+      setDemoForm({ name: '', email: '', businessName: '' });
+    } catch (err: unknown) {
+      setDemoStatus('error');
+      setDemoError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    }
+  };
   return (
     <>
       <Helmet>
@@ -161,6 +190,77 @@ const LandingPage = () => {
           </div>
         </section>
 
+        {/* Request Demo Section - For business owners */}
+        <section id="request-demo" className="py-16 lg:py-24 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="max-w-xl mx-auto">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Sparkles className="w-6 h-6 text-sage" />
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center">
+                  Request a Demo
+                </h2>
+              </div>
+              <p className="text-muted-foreground text-center mb-8">
+                Run a wellness business? Sign up for user access to try our booking platform — custom tailored to your needs.
+              </p>
+              {demoStatus === 'success' ? (
+                <div className="bg-sage/10 border border-sage/30 rounded-xl p-6 text-center">
+                  <p className="font-medium text-sage">Thanks for signing up!</p>
+                  <p className="text-sm text-muted-foreground mt-1">We&apos;ll be in touch soon to set up your demo.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleDemoSubmit} className="space-y-4 bg-card rounded-xl p-6 shadow-sm border border-border/50">
+                  <div>
+                    <Label htmlFor="demo-name">Name</Label>
+                    <Input
+                      id="demo-name"
+                      type="text"
+                      placeholder="Your name"
+                      value={demoForm.name}
+                      onChange={(e) => setDemoForm(f => ({ ...f, name: e.target.value }))}
+                      required
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="demo-email">Email</Label>
+                    <Input
+                      id="demo-email"
+                      type="email"
+                      placeholder="you@yourbusiness.com"
+                      value={demoForm.email}
+                      onChange={(e) => setDemoForm(f => ({ ...f, email: e.target.value }))}
+                      required
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="demo-business">Business name <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                    <Input
+                      id="demo-business"
+                      type="text"
+                      placeholder="Your spa or studio"
+                      value={demoForm.businessName}
+                      onChange={(e) => setDemoForm(f => ({ ...f, businessName: e.target.value }))}
+                      className="mt-1.5"
+                    />
+                  </div>
+                  {demoError && (
+                    <p className="text-sm text-destructive">{demoError}</p>
+                  )}
+                  <Button
+                    type="submit"
+                    className="w-full bg-sage hover:bg-sage/90"
+                    disabled={demoStatus === 'loading'}
+                  >
+                    {demoStatus === 'loading' ? 'Requesting...' : 'Request Demo Access'}
+                  </Button>
+                </form>
+              )}
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-16 lg:py-24 bg-sage/10">
           <div className="container mx-auto px-4 text-center">
@@ -196,6 +296,7 @@ const LandingPage = () => {
                 <ul className="space-y-2 text-sm">
                   <li><Link to="/book" className="text-muted-foreground hover:text-sage transition-colors">Book Online</Link></li>
                   <li><a href="#services" className="text-muted-foreground hover:text-sage transition-colors">Our Services</a></li>
+                  <li><a href="#request-demo" className="text-muted-foreground hover:text-sage transition-colors">Request Demo</a></li>
                   <li><Link to="/auth" className="text-muted-foreground hover:text-sage transition-colors">Staff Portal</Link></li>
                 </ul>
               </div>
