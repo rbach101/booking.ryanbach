@@ -145,15 +145,19 @@ Deno.serve(async (req) => {
         await resend.emails.send({
           from: BRAND.fromSupport,
           to: email,
-          subject: `Welcome to the ${BRAND.name} Team! 🌺`,
+          subject: `Your ${BRAND.name} Login — Online Booking for Your Small Business`,
           html: `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
               <div style="background: ${BRAND.primaryColor}; padding: 32px 24px; text-align: center; border-radius: 8px 8px 0 0;">
-                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Welcome to ${BRAND.name}! 🌺</h1>
-                <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">We're thrilled to have you on the team, ${staffName}.</p>
+                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Welcome to ${BRAND.name}</h1>
+                <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0; font-size: 14px;">Your account is ready, ${staffName}.</p>
               </div>
 
               <div style="padding: 32px 24px;">
+                <p style="color: #555; line-height: 1.7; margin: 0 0 24px;">
+                  ${BRAND.name} is an all-in-one booking system built for small businesses — spas, wellness studios, therapists, and practitioners. Clients book online 24/7, you get automatic reminders and notifications, and everything stays organized in one place.
+                </p>
+
                 <h2 style="color: #333; font-size: 18px; margin: 0 0 16px;">Your Login Credentials</h2>
                 <div style="background: #f8faf8; border: 1px solid #e2e8e2; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
                   <p style="margin: 0 0 8px; color: #666; font-size: 13px;">Email</p>
@@ -169,33 +173,33 @@ Deno.serve(async (req) => {
 
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
 
-                <h2 style="color: #333; font-size: 18px; margin: 0 0 16px;">📋 Quick Start Guide</h2>
-                <ol style="color: #555; line-height: 1.8; padding-left: 20px; margin: 0 0 24px;">
-                  <li><strong>Sign in</strong> using the button above with your email and temporary password.</li>
-                  <li><strong>Set your password</strong> — you'll be prompted to choose a secure one.</li>
-                  <li><strong>Check your schedule</strong> — view upcoming appointments on the <strong>Calendar</strong> page.</li>
-                  <li><strong>Review bookings</strong> — new bookings may need your approval in the <strong>Dashboard</strong>.</li>
-                  <li><strong>Add SOAP notes</strong> — document sessions after each appointment.</li>
-                </ol>
-
-                <h2 style="color: #333; font-size: 18px; margin: 0 0 16px;">💡 Things to Know</h2>
+                <h2 style="color: #333; font-size: 18px; margin: 0 0 16px;">What You Can Do</h2>
                 <ul style="color: #555; line-height: 1.8; padding-left: 20px; margin: 0 0 24px;">
-                  <li>Your schedule and availability can be managed from <strong>My Settings</strong>.</li>
-                  <li>You'll receive <strong>email & in-app notifications</strong> for new bookings and check-ins.</li>
-                  <li>Client intake forms are available under <strong>Intake Forms</strong> for review before appointments.</li>
-                  <li>Use the <strong>internal messaging</strong> system to communicate with the team.</li>
-                  <li>For any questions, reach out to your admin or reply to this email.</li>
+                  <li><strong>Online booking</strong> — Clients book and pay deposits 24/7 without calling.</li>
+                  <li><strong>Calendar sync</strong> — Connect Google Calendar to avoid double-booking.</li>
+                  <li><strong>Automated reminders</strong> — Email and SMS reminders reduce no-shows.</li>
+                  <li><strong>Payments & deposits</strong> — Collect deposits, tips, and balances online.</li>
+                  <li><strong>Intake forms</strong> — Clients complete waivers and health forms before appointments.</li>
+                  <li><strong>Internal messaging</strong> — Coordinate with your team in one place.</li>
                 </ul>
 
+                <h2 style="color: #333; font-size: 18px; margin: 0 0 16px;">Quick Start</h2>
+                <ol style="color: #555; line-height: 1.8; padding-left: 20px; margin: 0 0 24px;">
+                  <li><strong>Sign in</strong> with the button above (email + temporary password).</li>
+                  <li><strong>Set your password</strong> when prompted.</li>
+                  <li><strong>Set your availability</strong> in My Settings so clients can book you.</li>
+                  <li><strong>Check the Calendar</strong> for upcoming appointments.</li>
+                </ol>
+
                 <div style="background: #f0f4f0; border-radius: 8px; padding: 16px; text-align: center;">
-                  <p style="margin: 0; color: #555; font-size: 14px;">Questions? Contact us at <a href="mailto:${BRAND.supportEmail}" style="color: ${BRAND.primaryColor};">${BRAND.supportEmail}</a></p>
+                  <p style="margin: 0; color: #555; font-size: 14px;">Questions? <a href="mailto:${BRAND.supportEmail}" style="color: ${BRAND.primaryColor};">${BRAND.supportEmail}</a></p>
                 </div>
               </div>
 
               ${BRAND.emailFooterHtml}
             </div>
           `,
-          text: `Welcome to ${BRAND.name}! 🌺\n\nHi ${staffName},\n\nWe're thrilled to have you on the team!\n\n--- Your Login Credentials ---\nEmail: ${email}\nTemporary Password: ${tempPassword}\n\n⚠️ You'll be asked to set your own password when you first sign in.\n\nSign in here: ${loginUrl}\n\n--- Quick Start Guide ---\n1. Sign in using your email and temporary password.\n2. Set your password — you'll be prompted to choose a secure one.\n3. Check your schedule — view upcoming appointments on the Calendar page.\n4. Review bookings — new bookings may need your approval in the Dashboard.\n5. Add SOAP notes — document sessions after each appointment.\n\n--- Things to Know ---\n• Your schedule and availability can be managed from My Settings.\n• You'll receive email & in-app notifications for new bookings and check-ins.\n• Client intake forms are available under Intake Forms for review before appointments.\n• Use the internal messaging system to communicate with the team.\n• For any questions, reach out to your admin or reply to this email.${BRAND.emailFooterText}`,
+          text: `Welcome to ${BRAND.name}\n\nHi ${staffName},\n\n${BRAND.name} is an all-in-one booking system built for small businesses — spas, wellness studios, therapists, and practitioners. Clients book online 24/7, you get automatic reminders and notifications, and everything stays organized in one place.\n\n--- Your Login Credentials ---\nEmail: ${email}\nTemporary Password: ${tempPassword}\n\n⚠️ You'll be asked to set your own password when you first sign in.\n\nSign in here: ${loginUrl}\n\n--- What You Can Do ---\n• Online booking — Clients book and pay deposits 24/7 without calling.\n• Calendar sync — Connect Google Calendar to avoid double-booking.\n• Automated reminders — Email and SMS reminders reduce no-shows.\n• Payments & deposits — Collect deposits, tips, and balances online.\n• Intake forms — Clients complete waivers and health forms before appointments.\n• Internal messaging — Coordinate with your team in one place.\n\n--- Quick Start ---\n1. Sign in with the button above (email + temporary password).\n2. Set your password when prompted.\n3. Set your availability in My Settings so clients can book you.\n4. Check the Calendar for upcoming appointments.\n\nQuestions? ${BRAND.supportEmail}${BRAND.emailFooterText}`,
         });
       } catch (e) {
         console.error('Failed to send welcome email:', e);
