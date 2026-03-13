@@ -1,0 +1,1 @@
+UPDATE bookings SET room_id = NULL WHERE id = 'a2c96075-03d8-4f59-bcb0-77e4f15029df'

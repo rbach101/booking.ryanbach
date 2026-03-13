@@ -1,0 +1,1 @@
+ALTER TABLE public.kommo_connections ADD CONSTRAINT kommo_connections_subdomain_key UNIQUE (subdomain);

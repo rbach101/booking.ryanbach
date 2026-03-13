@@ -1,0 +1,1 @@
+DELETE FROM bookings WHERE id = '12ee2c51-00ae-4270-9498-252691b39976' AND practitioner_id IS NULL

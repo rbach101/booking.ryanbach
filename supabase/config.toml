@@ -1,0 +1,100 @@
+# Replace with your Supabase project ID (create new project at supabase.com)
+project_id = "REPLACE_WITH_YOUR_PROJECT_ID"
+
+[functions.google-calendar-callback]
+verify_jwt = false
+
+[functions.google-calendar-auth]
+verify_jwt = false
+
+[functions.google-calendar-sync]
+verify_jwt = false
+
+# NOTE: Add your app URL + /my-settings to Google Cloud Console for calendar OAuth
+# authorized redirect URIs for staff calendar connection to work
+
+[functions.calendar-cron-sync]
+verify_jwt = false
+
+[functions.create-appointment]
+verify_jwt = true
+
+[functions.customers]
+verify_jwt = true
+
+[functions.send-notification]
+verify_jwt = false
+
+[functions.send-sms]
+verify_jwt = true
+
+[functions.internal-messages]
+verify_jwt = true
+
+[functions.approve-booking]
+verify_jwt = true
+
+[functions.submit-booking]
+verify_jwt = false
+
+[functions.send-reminders]
+verify_jwt = false
+
+[functions.intake-forms]
+verify_jwt = false
+
+[functions.waitlist]
+verify_jwt = false
+
+[functions.ai-concierge]
+verify_jwt = false
+
+[functions.notify-checkin]
+verify_jwt = false
+
+[functions.notify-staff-booking]
+verify_jwt = false
+
+[functions.quick-action]
+verify_jwt = false
+
+[functions.post-appointment-payment]
+verify_jwt = false
+
+[functions.send-payment-link]
+verify_jwt = false
+
+[functions.send-test-email]
+verify_jwt = true
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.monitor-bookings]
+verify_jwt = true
+
+[functions.setup-klaviyo-flows]
+verify_jwt = true
+
+[functions.generate-sms-consent-link]
+verify_jwt = false
+
+[functions.confirm-sms-consent]
+verify_jwt = false
+
+[functions.send-sms-consent-emails]
+verify_jwt = false
+
+[functions.charge-balance]
+verify_jwt = false
+
+[functions.daily-practitioner-report]
+verify_jwt = false
+
+[functions.reconcile-payments]
+verify_jwt = false
+
+[functions.health-monitor]
+verify_jwt = false
+
+[functions.coupon-signup]
+verify_jwt = false

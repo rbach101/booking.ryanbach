@@ -1,0 +1,1 @@
+UPDATE public.practitioners SET image_url = '/images/practitioners/jaylynn.png' WHERE id = '37f16d1e-38be-4ed2-a290-78fe95923210';
