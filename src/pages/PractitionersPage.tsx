@@ -10,6 +10,8 @@ import { Plus, Loader2, Eye, EyeOff, RotateCcw } from 'lucide-react';
 import { usePractitioners } from '@/hooks/usePractitioners';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { getEdgeFunctionHeaders } from '@/lib/edgeFunctionHeaders';
+import { getFunctionErrorMessage } from '@/lib/functionError';
 import { toast } from 'sonner';
 import { Practitioner } from '@/types/booking';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -33,7 +35,9 @@ export default function PractitionersPage() {
   
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [deactivateTarget, setDeactivateTarget] = useState<Practitioner | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Practitioner | null>(null);
   const [deactivating, setDeactivating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [reactivating, setReactivating] = useState<string | null>(null);
 
   // Fetch deactivated practitioners when toggle is on
@@ -97,6 +101,29 @@ export default function PractitionersPage() {
     setEditDialog({ open: true, practitioner });
   };
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const headers = await getEdgeFunctionHeaders();
+      const { data, error } = await supabase.functions.invoke('delete-practitioner', {
+        headers,
+        body: { practitionerId: deleteTarget.id },
+      });
+      if (error) throw new Error(await getFunctionErrorMessage(error));
+      if (data?.error) throw new Error(data.error);
+      toast.success(data?.message || `${deleteTarget.name} has been permanently deleted`);
+      setDeleteTarget(null);
+      refetch();
+      queryClient.invalidateQueries({ queryKey: ['practitioners-deactivated'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-practitioners'] });
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Failed to delete practitioner');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -155,6 +182,7 @@ export default function PractitionersPage() {
                 onEditSchedule={() => handleEditSchedule(practitioner.id, practitioner.name)}
                 onEditInfo={isAdmin ? () => handleEditInfo(practitioner) : undefined}
                 onDeactivate={isAdmin ? () => setDeactivateTarget(practitioner) : undefined}
+                onDelete={isAdmin ? () => setDeleteTarget(practitioner) : undefined}
                 showInviteButton={isAdmin}
                 className="animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` } as React.CSSProperties}
@@ -187,20 +215,31 @@ export default function PractitionersPage() {
                     <p className="font-medium text-foreground truncate">{p.name}</p>
                     <p className="text-sm text-muted-foreground truncate">{p.email}</p>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1.5 shrink-0"
-                    onClick={() => handleReactivate(p.id, p.name)}
-                    disabled={reactivating === p.id}
-                  >
-                    {reactivating === p.id ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <RotateCcw className="w-3.5 h-3.5" />
-                    )}
-                    Reactivate
-                  </Button>
+                  <div className="flex gap-2 shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
+                      onClick={() => handleReactivate(p.id, p.name)}
+                      disabled={reactivating === p.id}
+                    >
+                      {reactivating === p.id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <RotateCcw className="w-3.5 h-3.5" />
+                      )}
+                      Reactivate
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => setDeleteTarget(p)}
+                      disabled={deleting}
+                    >
+                      Delete Permanently
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -237,7 +276,7 @@ export default function PractitionersPage() {
       <AlertDialog open={!!deactivateTarget} onOpenChange={(open) => !open && setDeactivateTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove {deactivateTarget?.name}?</AlertDialogTitle>
+            <AlertDialogTitle>Deactivate {deactivateTarget?.name}?</AlertDialogTitle>
             <AlertDialogDescription>
               This will deactivate the practitioner and remove them from booking selections. Their existing appointment history will be preserved. This can be reversed by an admin.
             </AlertDialogDescription>
@@ -249,7 +288,28 @@ export default function PractitionersPage() {
               disabled={deactivating}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deactivating ? 'Removing...' : 'Remove Practitioner'}
+              {deactivating ? 'Deactivating...' : 'Deactivate'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Permanently delete {deleteTarget?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the practitioner and their login account. They will be removed from all bookings and services. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? 'Deleting...' : 'Delete Permanently'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

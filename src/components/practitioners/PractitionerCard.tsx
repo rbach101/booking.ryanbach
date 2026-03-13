@@ -18,6 +18,7 @@ interface PractitionerCardProps {
   onEditSchedule?: () => void;
   onEditInfo?: () => void;
   onDeactivate?: () => void;
+  onDelete?: () => void;
   showInviteButton?: boolean;
 }
 
@@ -31,7 +32,7 @@ const dayAbbreviations: Record<DayOfWeek, string> = {
   sunday: 'Sun',
 };
 
-export function PractitionerCard({ practitioner, className, style, onEditSchedule, onEditInfo, onDeactivate, showInviteButton }: PractitionerCardProps) {
+export function PractitionerCard({ practitioner, className, style, onEditSchedule, onEditInfo, onDeactivate, onDelete, showInviteButton }: PractitionerCardProps) {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [resettingPassword, setResettingPassword] = useState(false);
   const [tempPassword, setTempPassword] = useState<string | null>(null);
@@ -257,18 +258,31 @@ export function PractitionerCard({ practitioner, className, style, onEditSchedul
           </div>
         )}
 
-        {/* Deactivate (admin only) */}
-        {onDeactivate && (
-          <div className="pt-4 border-t border-border/50">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={onDeactivate}
-            >
-              <Trash2 className="w-4 h-4" />
-              Remove Practitioner
-            </Button>
+        {/* Deactivate / Delete (admin only) */}
+        {(onDeactivate || onDelete) && (
+          <div className="pt-4 border-t border-border/50 space-y-2">
+            {onDeactivate && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full gap-2 text-muted-foreground hover:text-foreground"
+                onClick={onDeactivate}
+              >
+                <Trash2 className="w-4 h-4" />
+                Deactivate
+              </Button>
+            )}
+            {onDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={onDelete}
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete Permanently
+              </Button>
+            )}
           </div>
         )}
       </div>

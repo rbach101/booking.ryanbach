@@ -99,5 +99,8 @@ verify_jwt = false
 [functions.invite-user]
 verify_jwt = false
 
+[functions.delete-practitioner]
+verify_jwt = false
+
 [functions.coupon-signup]
 verify_jwt = false
