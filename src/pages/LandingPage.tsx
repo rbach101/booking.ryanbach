@@ -64,6 +64,13 @@ const LandingPage = () => {
         <section className="relative py-16 lg:py-24 bg-gradient-to-br from-sage/10 via-background to-sand/20">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
+              <div className="mb-12">
+                <img
+                  src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200"
+                  alt="Peaceful meditation in nature"
+                  className="w-full h-56 md:h-72 object-cover rounded-2xl shadow-lg"
+                />
+              </div>
               <div className="text-center mb-16">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
                   Not Another One-Size-Fits-All Booking App
@@ -245,6 +252,13 @@ const LandingPage = () => {
         {/* Pricing */}
         <section className="py-16 lg:py-24 bg-sage/10">
           <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto mb-12">
+              <img
+                src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200"
+                alt="Welcoming wellness studio"
+                className="w-full h-40 md:h-48 object-cover rounded-xl"
+              />
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
               Investment That Fits Your Business
             </h2>
@@ -279,6 +293,13 @@ const LandingPage = () => {
         {/* Features Section */}
         <section id="features" className="py-16 lg:py-24 bg-background">
           <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto mb-12">
+              <img
+                src="https://images.unsplash.com/photo-1571902943202-507e261dc740?w=1200"
+                alt="Personalized spa treatment room"
+                className="w-full h-48 md:h-56 object-cover rounded-xl"
+              />
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
               Built for You, Not for Everyone
             </h2>
@@ -354,6 +375,18 @@ const LandingPage = () => {
         {/* Why Choose Us */}
         <section className="py-16 lg:py-24 bg-muted/30">
           <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12 items-center">
+              <img
+                src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800"
+                alt="Thoughtful wellness space"
+                className="w-full h-48 object-cover rounded-xl order-2 md:order-1"
+              />
+              <img
+                src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800"
+                alt="Small yoga studio"
+                className="w-full h-48 object-cover rounded-xl order-1 md:order-2"
+              />
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
               The Custom Booking Difference
             </h2>
@@ -396,6 +429,13 @@ const LandingPage = () => {
         {/* CTA Section */}
         <section className="py-16 lg:py-24 bg-sage/10">
           <div className="container mx-auto px-4 text-center">
+            <div className="max-w-2xl mx-auto mb-10">
+              <img
+                src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=1200"
+                alt="Calm yoga practice"
+                className="w-full h-40 md:h-48 object-cover rounded-xl"
+              />
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               Ready for Something Different?
             </h2>
